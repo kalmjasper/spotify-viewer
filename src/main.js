@@ -46,15 +46,15 @@ function setMessage(title, text) {
 }
 
 function clearAuthSession() {
-  sessionStorage.removeItem(AUTH_STATE_KEY);
-  sessionStorage.removeItem(VERIFIER_KEY);
+  localStorage.removeItem(AUTH_STATE_KEY);
+  localStorage.removeItem(VERIFIER_KEY);
 }
 
 async function signIn() {
   const state = createRandomString(32);
   const verifier = createRandomString();
-  sessionStorage.setItem(AUTH_STATE_KEY, state);
-  sessionStorage.setItem(VERIFIER_KEY, verifier);
+  localStorage.setItem(AUTH_STATE_KEY, state);
+  localStorage.setItem(VERIFIER_KEY, verifier);
   const challenge = await createCodeChallenge(verifier);
   window.location.assign(
     createAuthorizeUrl({ clientId: SPOTIFY_CLIENT_ID, redirectUri: REDIRECT_URI, state, challenge }),
@@ -66,8 +66,8 @@ async function handleCallback() {
   const code = params.get("code");
   if (!code) return;
 
-  const expectedState = sessionStorage.getItem(AUTH_STATE_KEY);
-  const verifier = sessionStorage.getItem(VERIFIER_KEY);
+  const expectedState = localStorage.getItem(AUTH_STATE_KEY);
+  const verifier = localStorage.getItem(VERIFIER_KEY);
   if (!expectedState || params.get("state") !== expectedState || !verifier) {
     throw new Error("Spotify login state did not match. Please sign in again.");
   }
