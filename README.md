@@ -27,6 +27,8 @@ http://127.0.0.1:8080/?preview=1
 
 Preview mode renders local sample playback data through the same viewer markup and styles as the authenticated app. It does not start OAuth, read stored tokens, poll Spotify, or make any network requests.
 
+To clear the stored Spotify session, visit `logout/` relative to the app URL. The route signs out and returns to the main page without adding a control to the viewer layout.
+
 ## Verification
 
 ```sh

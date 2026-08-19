@@ -1,7 +1,6 @@
 import { SPOTIFY_CLIENT_ID } from "./config.js";
 import { isPreviewMode, PREVIEW_PLAYBACK } from "./preview.js";
 import {
-  clearTokens,
   createAuthorizeUrl,
   createCodeChallenge,
   createRandomString,
@@ -83,17 +82,6 @@ async function handleCallback() {
   window.history.replaceState({}, "", REDIRECT_URI);
 }
 
-function signOut() {
-  clearTokens(localStorage);
-  show("login");
-}
-
-function exitPreview() {
-  const url = new URL(window.location.href);
-  url.searchParams.delete("preview");
-  window.location.assign(url);
-}
-
 function render(playback) {
   const track = normalizeNowPlaying(playback);
   if (!track) {
@@ -137,13 +125,9 @@ async function poll() {
 }
 
 document.querySelector("#login-button").addEventListener("click", signIn);
-for (const button of document.querySelectorAll(".logout-button")) {
-  button.addEventListener("click", previewMode ? exitPreview : signOut);
-}
 
 async function start() {
   if (previewMode) {
-    document.querySelector("#logout-button").textContent = "Exit preview";
     render(PREVIEW_PLAYBACK);
     return;
   }

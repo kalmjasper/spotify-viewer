@@ -40,6 +40,7 @@ jobs:
           mkdir _site
           cp index.html styles.css _site/
           cp -R assets _site/
+          cp -R logout _site/
           cp -R src _site/
           printf 'export const SPOTIFY_CLIENT_ID = "%s";\n' "$SPOTIFY_CLIENT_ID" > _site/src/config.js
 
