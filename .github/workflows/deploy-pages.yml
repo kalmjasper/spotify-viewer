@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    env:
+      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Test
+        run: npm test && npm run check
+
+      - name: Build static site
+        shell: bash
+        run: |
+          if [[ ! "$SPOTIFY_CLIENT_ID" =~ ^[[:alnum:]]+$ ]]; then
+            echo "Set a valid SPOTIFY_CLIENT_ID repository variable before deploying."
+            exit 1
+          fi
+
+          mkdir _site
+          cp index.html styles.css _site/
+          cp -R src _site/
+          printf 'export const SPOTIFY_CLIENT_ID = "%s";\n' "$SPOTIFY_CLIENT_ID" > _site/src/config.js
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

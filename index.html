@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://i.scdn.co data:; connect-src https://api.spotify.com https://accounts.spotify.com; object-src 'none'; base-uri 'none'"
+    >
+    <title>Spotify Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main>
+      <section id="setup" class="panel" hidden>
+        <h1>Spotify Viewer</h1>
+        <p>Add your Spotify Client ID to <code>src/config.js</code>, then reload this page.</p>
+      </section>
+
+      <section id="login" class="panel" hidden>
+        <h1>Spotify Viewer</h1>
+        <p>Sign in to show what is playing on your Spotify account.</p>
+        <button id="login-button" type="button">Sign in with Spotify</button>
+      </section>
+
+      <section id="viewer" class="viewer" hidden>
+        <a id="track-link" class="cover-link" target="_blank" rel="noreferrer">
+          <img id="cover" alt="Album cover">
+        </a>
+        <div class="details">
+          <p id="status" class="status">Now playing</p>
+          <h1 id="title"></h1>
+          <p id="artist" class="artist"></p>
+          <p id="album" class="album"></p>
+          <progress id="progress" max="100" value="0" aria-label="Playback progress"></progress>
+          <button id="logout-button" class="secondary logout-button" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <section id="message" class="panel" hidden>
+        <h1 id="message-title">Nothing playing</h1>
+        <p id="message-text">Start playing something in Spotify.</p>
+        <button id="message-logout-button" class="secondary logout-button" type="button">Sign out</button>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
