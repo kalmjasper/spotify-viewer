@@ -94,7 +94,11 @@ function render(playback) {
   elements.artist.textContent = track.artist;
   elements.album.textContent = track.album;
   elements.status.textContent = track.isPlaying ? "Now playing" : "Paused";
-  elements.progress.value = track.progress;
+  const progress = Math.min(100, Math.max(0, track.progress));
+  elements.progress.setAttribute("aria-valuenow", String(Math.round(progress)));
+  elements.progress.style.setProperty("--progress", `${progress}%`);
+  elements.progress.style.setProperty("--record-offset", `${-progress}%`);
+  elements.progress.classList.toggle("is-playing", track.isPlaying);
   elements.cover.src = track.imageUrl || "";
   elements.cover.alt = track.album ? `${track.album} cover` : "Cover art";
   elements.trackLink.href = track.spotifyUrl || "https://open.spotify.com";

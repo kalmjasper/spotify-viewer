@@ -35,7 +35,25 @@
           <h1 id="title"></h1>
           <p id="artist" class="artist"></p>
           <p id="album" class="album"></p>
-          <progress id="progress" max="100" value="0" aria-label="Playback progress"></progress>
+          <div
+            id="progress"
+            class="music-progress"
+            role="progressbar"
+            aria-label="Playback progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="music-progress__staff" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i>
+              <span class="music-progress__note note-one">&#9834;</span>
+              <span class="music-progress__note note-two">&#9835;</span>
+              <span class="music-progress__note note-three">&#9834;</span>
+            </div>
+            <div class="music-progress__record" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
         </div>
         <img class="corner-art" src="assets/platenmannetjes.png" alt="" aria-hidden="true">
       </section>
