@@ -1,4 +1,5 @@
 import { SPOTIFY_CLIENT_ID } from "./config.js";
+import { isPreviewMode, PREVIEW_PLAYBACK } from "./preview.js";
 import {
   clearTokens,
   createAuthorizeUrl,
@@ -15,6 +16,7 @@ const REDIRECT_URI = `${window.location.origin}${window.location.pathname}`;
 const AUTH_STATE_KEY = "spotify_auth_state";
 const VERIFIER_KEY = "spotify_code_verifier";
 const SECTION_NAMES = ["setup", "login", "viewer", "message"];
+const previewMode = isPreviewMode(window.location.search);
 
 const elements = {
   setup: document.querySelector("#setup"),
@@ -86,6 +88,12 @@ function signOut() {
   show("login");
 }
 
+function exitPreview() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("preview");
+  window.location.assign(url);
+}
+
 function render(playback) {
   const track = normalizeNowPlaying(playback);
   if (!track) {
@@ -130,10 +138,16 @@ async function poll() {
 
 document.querySelector("#login-button").addEventListener("click", signIn);
 for (const button of document.querySelectorAll(".logout-button")) {
-  button.addEventListener("click", signOut);
+  button.addEventListener("click", previewMode ? exitPreview : signOut);
 }
 
 async function start() {
+  if (previewMode) {
+    document.querySelector("#logout-button").textContent = "Exit preview";
+    render(PREVIEW_PLAYBACK);
+    return;
+  }
+
   if (!SPOTIFY_CLIENT_ID || SPOTIFY_CLIENT_ID === "YOUR_SPOTIFY_CLIENT_ID") {
     show("setup");
     return;

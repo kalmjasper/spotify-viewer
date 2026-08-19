@@ -17,6 +17,16 @@ python3 -m http.server 8080 --bind 127.0.0.1
 
 Open `http://127.0.0.1:8080/`.
 
+### Layout preview
+
+To work on the layout without configuring Spotify or signing in, open:
+
+```text
+http://127.0.0.1:8080/?preview=1
+```
+
+Preview mode renders local sample playback data through the same viewer markup and styles as the authenticated app. It does not start OAuth, read stored tokens, poll Spotify, or make any network requests.
+
 ## Verification
 
 ```sh

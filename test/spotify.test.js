@@ -7,6 +7,7 @@ import {
   getAccessToken,
   normalizeNowPlaying,
 } from "../src/spotify.js";
+import { isPreviewMode, PREVIEW_PLAYBACK } from "../src/preview.js";
 
 function createStorage(values = {}) {
   const data = new Map(Object.entries(values));
@@ -99,6 +100,13 @@ test("track playback is reduced to view data", () => {
     progress: 25,
     isPlaying: true,
   });
+});
+
+test("layout preview is enabled only by the explicit preview query value", () => {
+  assert.equal(isPreviewMode("?preview=1"), true);
+  assert.equal(isPreviewMode("?preview=0"), false);
+  assert.equal(isPreviewMode("?other=value"), false);
+  assert.equal(normalizeNowPlaying(PREVIEW_PLAYBACK)?.album, "Layout Preview");
 });
 
 test("clearing tokens leaves unrelated local storage intact", () => {

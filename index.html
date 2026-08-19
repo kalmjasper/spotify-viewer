@@ -16,26 +16,29 @@
       <section id="setup" class="panel" hidden>
         <h1>Spotify Viewer</h1>
         <p>Add your Spotify Client ID to <code>src/config.js</code>, then reload this page.</p>
+        <p><a class="preview-link" href="?preview=1">Preview the layout without signing in</a></p>
       </section>
 
       <section id="login" class="panel" hidden>
         <h1>Spotify Viewer</h1>
         <p>Sign in to show what is playing on your Spotify account.</p>
         <button id="login-button" type="button">Sign in with Spotify</button>
+        <p><a class="preview-link" href="?preview=1">Preview the layout without signing in</a></p>
       </section>
 
       <section id="viewer" class="viewer" hidden>
+        <p id="status" class="status">NOW PLAYING</p>
         <a id="track-link" class="cover-link" target="_blank" rel="noreferrer">
           <img id="cover" alt="Album cover">
         </a>
         <div class="details">
-          <p id="status" class="status">Now playing</p>
           <h1 id="title"></h1>
           <p id="artist" class="artist"></p>
           <p id="album" class="album"></p>
           <progress id="progress" max="100" value="0" aria-label="Playback progress"></progress>
           <button id="logout-button" class="secondary logout-button" type="button">Sign out</button>
         </div>
+        <img class="corner-art" src="assets/platenmannetjes.png" alt="" aria-hidden="true">
       </section>
 
       <section id="message" class="panel" hidden>

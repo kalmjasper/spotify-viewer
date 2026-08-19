@@ -27,23 +27,30 @@ main {
 }
 
 .viewer {
-  width: min(100%, 64rem);
-  display: grid;
-  grid-template-columns: minmax(16rem, 1fr) 1fr;
-  gap: 3rem;
+  width: min(calc(100vw - 4rem), 60rem);
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
-.cover-link,
+.cover-link {
+  display: block;
+  width: min(calc(100vw - 4rem), 56rem);
+}
+
 #cover {
   display: block;
   width: 100%;
-}
-
-#cover {
   aspect-ratio: 1;
   object-fit: cover;
   background: #222;
+}
+
+.details {
+  width: 100%;
+  min-width: 0;
+  margin-top: 1.5rem;
 }
 
 h1 {
@@ -55,13 +62,48 @@ p {
   margin: 0.5rem 0;
 }
 
-.status,
+.preview-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #aaa;
+}
+
+.preview-link:hover {
+  color: #fff;
+}
+
+.status {
+  margin: 0 0 2rem;
+  color: #fff;
+  font-size: clamp(3rem, 9vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
 .album {
   color: #aaa;
 }
 
+.details h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  overflow-wrap: anywhere;
+}
+
 .artist {
   font-size: 1.5rem;
+}
+
+.corner-art {
+  position: fixed;
+  bottom: clamp(0.75rem, 2vw, 2rem);
+  left: clamp(0.75rem, 2vw, 2rem);
+  width: clamp(8rem, 22vw, 22rem);
+  height: auto;
+  opacity: 0.72;
+  filter: invert(1);
+  pointer-events: none;
 }
 
 progress {
@@ -91,8 +133,20 @@ button.secondary {
 }
 
 @media (max-width: 700px) {
-  .viewer {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  main {
+    padding: 0.75rem;
+  }
+
+  .status {
+    margin-bottom: 1.25rem;
+  }
+
+  .viewer,
+  .cover-link {
+    width: calc(100vw - 1.5rem);
+  }
+
+  .corner-art {
+    opacity: 0.45;
   }
 }
