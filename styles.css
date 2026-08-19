@@ -192,7 +192,6 @@ p {
     radial-gradient(circle, #f26f9f 0 17%, #f7cc4b 17.5% 28%, transparent 28.5%),
     repeating-radial-gradient(circle, #292929 0 2px, #111 3px 5px);
   box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.55);
-  transition: left 600ms ease, transform 600ms ease;
 }
 
 .music-progress__record::before {
@@ -223,10 +222,6 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .music-progress__record {
-    transition: none;
-  }
-
   .music-progress.is-playing .music-progress__record::before {
     animation: none;
   }

@@ -16,6 +16,10 @@ const AUTH_STATE_KEY = "spotify_auth_state";
 const VERIFIER_KEY = "spotify_code_verifier";
 const SECTION_NAMES = ["setup", "login", "viewer", "message"];
 const previewMode = isPreviewMode(window.location.search);
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let playbackClock = null;
+let progressAnimationFrame = null;
 
 const elements = {
   setup: document.querySelector("#setup"),
@@ -47,6 +51,75 @@ function setMessage(title, text) {
 function clearAuthSession() {
   localStorage.removeItem(AUTH_STATE_KEY);
   localStorage.removeItem(VERIFIER_KEY);
+}
+
+function setProgress(progress) {
+  const boundedProgress = Math.min(100, Math.max(0, progress));
+  const roundedProgress = String(Math.round(boundedProgress));
+
+  if (elements.progress.getAttribute("aria-valuenow") !== roundedProgress) {
+    elements.progress.setAttribute("aria-valuenow", roundedProgress);
+  }
+  elements.progress.style.setProperty("--progress", `${boundedProgress}%`);
+  elements.progress.style.setProperty("--record-offset", `${-boundedProgress}%`);
+}
+
+function estimatedPosition(clock, now) {
+  if (!clock.isPlaying) return clock.positionMs;
+
+  const elapsed = Math.min(now - clock.syncedAt, POLL_INTERVAL);
+  const correctionProgress = Math.min(1, elapsed / POLL_INTERVAL);
+  return clock.positionMs + elapsed + (clock.correctionMs * correctionProgress);
+}
+
+function animateProgress(now) {
+  if (!playbackClock) return;
+
+  const positionMs = Math.min(playbackClock.durationMs, estimatedPosition(playbackClock, now));
+  setProgress(playbackClock.durationMs ? (positionMs / playbackClock.durationMs) * 100 : 0);
+
+  const withinPollInterval = now - playbackClock.syncedAt < POLL_INTERVAL;
+  if (playbackClock.isPlaying && positionMs < playbackClock.durationMs && withinPollInterval) {
+    progressAnimationFrame = window.requestAnimationFrame(animateProgress);
+  } else {
+    progressAnimationFrame = null;
+  }
+}
+
+function syncProgress(playback, track) {
+  const now = performance.now();
+  const durationMs = Number(playback.item?.duration_ms) || 0;
+  const serverPositionMs = Math.min(durationMs, Number(playback.progress_ms) || 0);
+  const trackKey = track.spotifyUrl || `${track.title}:${track.artist}`;
+  let positionMs = serverPositionMs;
+  let correctionMs = 0;
+
+  if (playbackClock?.trackKey === trackKey && playbackClock.isPlaying && track.isPlaying) {
+    const currentPositionMs = estimatedPosition(playbackClock, now);
+    const differenceMs = serverPositionMs - currentPositionMs;
+
+    // Small polling discrepancies are blended in; larger differences are deliberate seeks.
+    if (Math.abs(differenceMs) < 2_000) {
+      positionMs = currentPositionMs;
+      correctionMs = differenceMs;
+    }
+  }
+
+  playbackClock = {
+    trackKey,
+    positionMs,
+    correctionMs,
+    durationMs,
+    isPlaying: track.isPlaying,
+    syncedAt: now,
+  };
+
+  setProgress(durationMs ? (positionMs / durationMs) * 100 : track.progress);
+
+  if (reduceMotion || !track.isPlaying || !durationMs) return;
+  if (progressAnimationFrame === null) {
+    progressAnimationFrame = window.requestAnimationFrame(animateProgress);
+  }
 }
 
 async function signIn() {
@@ -85,6 +158,11 @@ async function handleCallback() {
 function render(playback) {
   const track = normalizeNowPlaying(playback);
   if (!track) {
+    playbackClock = null;
+    if (progressAnimationFrame !== null) {
+      window.cancelAnimationFrame(progressAnimationFrame);
+      progressAnimationFrame = null;
+    }
     setMessage("Nothing playing", "Start playing something in Spotify.");
     show("message");
     return;
@@ -94,10 +172,7 @@ function render(playback) {
   elements.artist.textContent = track.artist;
   elements.album.textContent = track.album;
   elements.status.textContent = track.isPlaying ? "Now playing" : "Paused";
-  const progress = Math.min(100, Math.max(0, track.progress));
-  elements.progress.setAttribute("aria-valuenow", String(Math.round(progress)));
-  elements.progress.style.setProperty("--progress", `${progress}%`);
-  elements.progress.style.setProperty("--record-offset", `${-progress}%`);
+  syncProgress(playback, track);
   elements.progress.classList.toggle("is-playing", track.isPlaying);
   elements.cover.src = track.imageUrl || "";
   elements.cover.alt = track.album ? `${track.album} cover` : "Cover art";
